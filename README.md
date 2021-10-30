@@ -1,3 +1,4 @@
+![logo](https://github.com/AlexeyTrofimenko/codeinside-badges/blob/main/logo.png)
 # CodeInside badges
 The badges container for CodeInside backend.
 ## Usage
