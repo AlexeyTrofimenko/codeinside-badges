@@ -1,7 +1,8 @@
 name: Cloners
 on:
   workflow_dispatch:
-
+  schedule:
+    - cron:  '0 0,12 * * *'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,7 +13,7 @@ jobs:
         run: |
           curl --user "${{ github.actor }}:${{ secrets.PUBLIC_OWNER_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/mgtippet33/GiftGenerator/traffic/clones \
+            https://api.github.com/repos/MagisterFelix/CodeInside/traffic/clones \
             > cloners_badge/cloners.json
           date > cloners_badge/date.txt
       - name: Commit report
@@ -22,5 +23,5 @@ jobs:
           git config --global user.password ${{ secrets.PRIVATE_OWNER_TOKEN }}
           git add cloners_badge/cloners.json
           git add cloners_badge/date.txt
-          git commit -m "Auto-update cloners"
+          git commit -m "Auto-update cloners badge"
           git push https://AlexeyTrofimenko:${{ secrets.PRIVATE_OWNER_TOKEN }}@github.com/AlexeyTrofimenko/codeinside-badges --all
