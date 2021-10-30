@@ -1,0 +1,26 @@
+name: Cloners
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Parse clone count
+        run: |
+          curl --user "${{ github.actor }}:${{ secrets.PUBLIC_OWNER_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/mgtippet33/GiftGenerator/traffic/clones \
+            > cloners_badge/cloners.json
+          date > cloners_badge/date.txt
+      - name: Commit report
+        run: |
+          git config --global user.name ${{ secrets.OWNER_NAME }} 
+          git config --global user.email ${{ secrets.OWNER_EMAIL }}
+          git config --global user.password ${{ secrets.PRIVATE_OWNER_TOKEN }}
+          git add cloners_badge/cloners.json
+          git add cloners_badge/date.txt
+          git commit -m "Auto-update cloners"
+          git push https://AlexeyTrofimenko:${{ secrets.PRIVATE_OWNER_TOKEN }}@github.com/AlexeyTrofimenko/codeinside-badges --all
