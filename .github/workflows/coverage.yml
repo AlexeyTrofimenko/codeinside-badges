@@ -1,0 +1,45 @@
+name: Coverage
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set-up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Clone CodeInside Backend Repository
+        run: |
+          git clone https://github.com/MagisterFelix/CodeInside
+      - name: Run Tests
+        run: |
+          cd CodeInside
+          python -m pip install --upgrade pip --quiet
+          pip install -r requirements.txt --quiet
+          pip install coverage --quiet
+          python manage.py makemigrations
+          python manage.py migrate
+          coverage run --source='.' manage.py test
+          coverage report
+      - name: Save coverage report
+        run: |
+          cd CodeInside
+          coverage json
+          python -c 'import json;count = json.load(open("coverage.json"))["totals"]["percent_covered_display"]; dct = {"count": f"{count}%"}; print(json.dumps(dct, indent=2))' > ../coverage_badge/coverage.json
+          date > ../coverage_badge/date.txt
+      - name: Commit report
+        run: |
+          git config --global user.name ${{ secrets.OWNER_NAME }}
+          git config --global user.email ${{ secrets.OWNER_EMAIL }}
+          git config --global user.password ${{ secrets.PRIVATE_OWNER_TOKEN }}
+          git add coverage_badge/coverage.json
+          git add coverage_badge/date.txt
+          git commit -m "Auto-update coverage badge"
+          git push https://AlexeyTrofimenko:${{ secrets.PRIVATE_OWNER_TOKEN }}@github.com/AlexeyTrofimenko/codeinside-badges --all
