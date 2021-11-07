@@ -28,7 +28,15 @@ jobs:
           pip install coverage --quiet
           python manage.py makemigrations
           python manage.py migrate
-          coverage run --source='.' manage.py test
+          echo "
+          [run]
+          source = .
+          omit = *tests*,*apps.py,*manage.py,*__init__.py,*migrations*,*asgi*,*wsgi*,*admin.py,*urls.py
+
+          [report]
+          omit = *tests*,*apps.py,*manage.py,*__init__.py,*migrations*,*asgi*,*wsgi*,*admin.py,*urls.py
+          " > .coveragerc
+          coverage run manage.py test
           coverage report
       - name: Save coverage report
         run: |
